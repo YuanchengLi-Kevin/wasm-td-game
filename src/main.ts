@@ -5,46 +5,42 @@
 
 import * as THREE from 'three';
 import init from '../pkg/wasm_td_game';
-import { EnemyView } from './features/enemy/enemy-view';
+import { EnemyRenderer } from './features/enemy/services/enemy-renderer';
 
 async function setup() {
-    // 1. Initialize WebAssembly
     await init();
 
-    // 2. Setup Three.js World
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111111); // Dark minimalist background
+    scene.background = new THREE.Color(0x111111);
 
-    // 3. Setup Camera (looking down at an angle)
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 5, 5);
     camera.lookAt(0, 0, 0);
 
-    // 4. Setup Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // 5. Add Lighting (Crucial for 3D, otherwise everything is black)
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 10, 5);
     scene.add(directionalLight);
 
-    // 6. Initialize our Feature
-    const enemy = new EnemyView();
-    scene.add(enemy.mesh);
+    const enemies = new EnemyRenderer(scene);
+    const timer = new THREE.Timer();
+    timer.connect(document);
 
-    // 7. The Game Loop
-    function animate() {
+    function animate(timestamp: number) {
         requestAnimationFrame(animate);
 
-        enemy.update(); // Moves the enemy via Rust logic
+        timer.update(timestamp);
+        const deltaTime = timer.getDelta();
+        enemies.update(deltaTime);
         
         renderer.render(scene, camera);
     }
-    animate();
+    requestAnimationFrame(animate);
 }
 
 setup();

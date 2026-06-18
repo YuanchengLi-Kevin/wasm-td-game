@@ -3,6 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-pub mod classes;
-pub mod enemy_config;
-pub mod services;
+pub mod enemy_service;
