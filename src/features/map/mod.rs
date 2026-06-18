@@ -3,5 +3,5 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-pub mod enemy;
-pub mod map;
+pub mod classes;
+pub mod services;

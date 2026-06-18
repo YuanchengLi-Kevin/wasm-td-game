@@ -5,7 +5,7 @@
 
 import * as THREE from 'three';
 
-import { EnemyService, EnemyType } from '../../../../pkg/wasm_td_game';
+import { EnemyService, EnemyType, type MapService } from '../../../../pkg/wasm_td_game';
 import { EnemyView } from '../classes/enemy-view';
 
 export class EnemyRenderer {
@@ -14,9 +14,9 @@ export class EnemyRenderer {
     private readonly views: EnemyView[] = [];
     private destroyed = false;
 
-    constructor(parent: THREE.Object3D) {
+    constructor(parent: THREE.Object3D, mapService: MapService) {
         this.parent = parent;
-        this.service = new EnemyService();
+        this.service = new EnemyService(mapService);
     }
 
     spawn(enemyType: EnemyType = EnemyType.Basic): number {

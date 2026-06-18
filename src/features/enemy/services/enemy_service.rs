@@ -8,6 +8,8 @@ use wasm_bindgen::prelude::*;
 use crate::core::time::FixedStepAccumulator;
 use crate::features::enemy::classes::enemy::Enemy;
 use crate::features::enemy::enemy_config::EnemyType;
+use crate::features::map::classes::game_map::GameMap;
+use crate::features::map::services::map_service::MapService;
 
 const SPAWN_INTERVAL: f32 = 1.0;
 const FIXED_STEP_SECONDS: f32 = 1.0 / 60.0;
@@ -18,12 +20,13 @@ pub struct EnemyService {
     enemies: Vec<Enemy>,
     spawn_timer: f32,
     fixed_step: FixedStepAccumulator,
+    map: GameMap,
 }
 
 #[wasm_bindgen]
 impl EnemyService {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
+    pub fn new(map_service: &MapService) -> Self {
         Self {
             enemies: Vec::new(),
             spawn_timer: 0.0,
@@ -31,12 +34,15 @@ impl EnemyService {
                 FIXED_STEP_SECONDS,
                 MAX_STEPS_PER_UPDATE,
             ),
+            map: map_service.map().clone(),
         }
     }
 
     pub fn spawn_enemy(&mut self, enemy_type: EnemyType) -> u32 {
         let index = self.enemies.len() as u32;
-        self.enemies.push(Enemy::new(enemy_type));
+        if let Some(start_position) = self.map.world_path().first() {
+            self.enemies.push(Enemy::new(enemy_type, *start_position));
+        }
         index
     }
 
@@ -80,8 +86,9 @@ impl EnemyService {
             self.spawn_timer -= SPAWN_INTERVAL;
         }
 
+        let path = self.map.world_path();
         for enemy in &mut self.enemies {
-            enemy.update(step_seconds);
+            enemy.update(step_seconds, path);
         }
     }
 }
