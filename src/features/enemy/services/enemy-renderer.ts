@@ -9,14 +9,14 @@ import { EnemyService, EnemyType, type MapService } from '../../../../pkg/wasm_t
 import { EnemyView } from '../classes/enemy-view';
 
 export class EnemyRenderer {
-    private readonly service: EnemyService;
+    readonly enemyService: EnemyService;
     private readonly parent: THREE.Object3D;
     private readonly views: EnemyView[] = [];
     private destroyed = false;
 
     constructor(parent: THREE.Object3D, mapService: MapService) {
         this.parent = parent;
-        this.service = new EnemyService(mapService);
+        this.enemyService = new EnemyService(mapService);
     }
 
     spawn(enemyType: EnemyType = EnemyType.Basic): number {
@@ -24,7 +24,7 @@ export class EnemyRenderer {
             throw new Error('Cannot spawn an enemy after the renderer is destroyed.');
         }
 
-        const index = this.service.spawn_enemy(enemyType);
+        const index = this.enemyService.spawn_enemy(enemyType);
         const view = new EnemyView();
         this.views.push(view);
         this.parent.add(view.mesh);
@@ -32,7 +32,7 @@ export class EnemyRenderer {
     }
 
     remove(index: number): boolean {
-        if (this.destroyed || !this.service.remove_enemy(index)) {
+        if (this.destroyed || !this.enemyService.remove_enemy(index)) {
             return false;
         }
 
@@ -46,9 +46,9 @@ export class EnemyRenderer {
             return;
         }
 
-        this.service.update(deltaTime);
+        this.enemyService.update(deltaTime);
         this.syncViewCount();
-        const positions = this.service.get_positions();
+        const positions = this.enemyService.get_positions();
 
         for (let index = 0; index < this.views.length; index += 1) {
             const offset = index * 3;
@@ -61,11 +61,14 @@ export class EnemyRenderer {
     }
 
     private syncViewCount() {
-        const enemyCount = this.service.enemy_count();
+        const enemyCount = this.enemyService.enemy_count();
         while (this.views.length < enemyCount) {
             const view = new EnemyView();
             this.views.push(view);
             this.parent.add(view.mesh);
+        }
+        while (this.views.length > enemyCount) {
+            this.views.pop()?.destroy();
         }
     }
 
@@ -79,6 +82,6 @@ export class EnemyRenderer {
             view.destroy();
         }
         this.views.length = 0;
-        this.service.free();
+        this.enemyService.free();
     }
 }

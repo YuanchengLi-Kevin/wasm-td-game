@@ -9,6 +9,7 @@ import defaultMapJson from './constants/maps/default_map.json?raw';
 import { EnemyRenderer } from './features/enemy/services/enemy-renderer';
 import { createSkyBackground } from './features/environment/services/sky-background';
 import { MapRenderer } from './features/map/services/map-renderer';
+import { TowerRenderer } from './features/tower/services/tower-renderer';
 
 async function setup() {
     await init();
@@ -33,6 +34,7 @@ async function setup() {
     const mapService = new MapService(defaultMapJson);
     new MapRenderer(scene, mapService);
     const enemies = new EnemyRenderer(scene, mapService);
+    const towers = new TowerRenderer(scene, mapService, camera, renderer.domElement);
     const timer = new THREE.Timer();
     timer.connect(document);
 
@@ -41,8 +43,9 @@ async function setup() {
 
         timer.update(timestamp);
         const deltaTime = timer.getDelta();
+        towers.update(deltaTime, enemies.enemyService);
         enemies.update(deltaTime);
-        
+
         renderer.render(scene, camera);
     }
     requestAnimationFrame(animate);

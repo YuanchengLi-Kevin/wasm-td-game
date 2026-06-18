@@ -7,6 +7,7 @@ use crate::core::math::Position;
 use crate::features::enemy::enemy_config::{EnemyConfig, EnemyType};
 
 pub struct Enemy {
+    id: u32,
     position: Position,
     next_waypoint_index: usize,
     health: f32,
@@ -14,9 +15,10 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn new(enemy_type: EnemyType, start_position: Position) -> Self {
+    pub fn new(id: u32, enemy_type: EnemyType, start_position: Position) -> Self {
         let config = EnemyConfig::for_type(enemy_type);
         Self {
+            id,
             position: start_position,
             next_waypoint_index: 1,
             health: config.max_health,
@@ -57,6 +59,18 @@ impl Enemy {
 
     pub fn health(&self) -> f32 {
         self.health
+    }
+
+    pub fn id(&self) -> u32 {
+        self.id
+    }
+
+    pub fn take_damage(&mut self, damage: f32) {
+        self.health = (self.health - damage.max(0.0)).max(0.0);
+    }
+
+    pub fn is_defeated(&self) -> bool {
+        self.health <= 0.0
     }
 
     pub fn max_health(&self) -> f32 {

@@ -18,6 +18,7 @@ const MAX_STEPS_PER_UPDATE: u32 = 5;
 #[wasm_bindgen]
 pub struct EnemyService {
     enemies: Vec<Enemy>,
+    next_enemy_id: u32,
     spawn_timer: f32,
     fixed_step: FixedStepAccumulator,
     map: GameMap,
@@ -29,6 +30,7 @@ impl EnemyService {
     pub fn new(map_service: &MapService) -> Self {
         Self {
             enemies: Vec::new(),
+            next_enemy_id: 0,
             spawn_timer: 0.0,
             fixed_step: FixedStepAccumulator::new(
                 FIXED_STEP_SECONDS,
@@ -41,7 +43,9 @@ impl EnemyService {
     pub fn spawn_enemy(&mut self, enemy_type: EnemyType) -> u32 {
         let index = self.enemies.len() as u32;
         if let Some(start_position) = self.map.world_path().first() {
-            self.enemies.push(Enemy::new(enemy_type, *start_position));
+            let id = self.next_enemy_id;
+            self.next_enemy_id = self.next_enemy_id.wrapping_add(1);
+            self.enemies.push(Enemy::new(id, enemy_type, *start_position));
         }
         index
     }
@@ -79,6 +83,45 @@ impl EnemyService {
 }
 
 impl EnemyService {
+    pub fn nearest_enemy_id(
+        &self,
+        position: &crate::core::math::Position,
+        range: f32,
+    ) -> Option<u32> {
+        let range_squared = range * range;
+        self.enemies
+            .iter()
+            .filter_map(|enemy| {
+                let enemy_position = enemy.position();
+                let delta_x = enemy_position.x - position.x;
+                let delta_z = enemy_position.z - position.z;
+                let distance_squared = delta_x * delta_x + delta_z * delta_z;
+                (distance_squared <= range_squared).then_some((enemy.id(), distance_squared))
+            })
+            .min_by(|left, right| left.1.total_cmp(&right.1))
+            .map(|(id, _)| id)
+    }
+
+    pub fn position_by_id(&self, id: u32) -> Option<crate::core::math::Position> {
+        self.enemies
+            .iter()
+            .find(|enemy| enemy.id() == id)
+            .map(|enemy| *enemy.position())
+    }
+
+    pub fn damage_enemy(&mut self, id: u32, damage: f32) -> bool {
+        let Some(index) = self.enemies.iter().position(|enemy| enemy.id() == id) else {
+            return false;
+        };
+
+        let enemy = &mut self.enemies[index];
+        enemy.take_damage(damage);
+        if enemy.is_defeated() {
+            self.enemies.remove(index);
+        }
+        true
+    }
+
     fn simulate(&mut self, step_seconds: f32) {
         self.spawn_timer += step_seconds;
         while self.spawn_timer >= SPAWN_INTERVAL {

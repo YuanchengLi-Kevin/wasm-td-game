@@ -1,0 +1,11 @@
+{
+  "_copyright": "Copyright (c) 2026 Yuancheng Li",
+  "_license": "Apache-2.0",
+  "basic": {
+    "attack_range": 3.0,
+    "attack_cooldown_seconds": 0.75,
+    "projectile_damage": 25.0,
+    "projectile_speed": 7.5,
+    "projectile_height": 0.8
+  }
+}

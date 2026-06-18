@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 
 import type { MapService } from '../../../../pkg/wasm_td_game';
-import { MAP_TILE_COLORS } from '../../../constants/map-visuals';
+import { MAP_TILE_COLORS } from '../../../constants/maps/map-visuals';
 
 const TILE_SIZE = 1;
 const TILE_HEIGHT = 0.1;

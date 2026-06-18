@@ -68,6 +68,18 @@ impl GameMap {
         &self.world_path
     }
 
+    pub fn contains(&self, position: GridPosition) -> bool {
+        position.column < self.width && position.row < self.height
+    }
+
+    pub fn is_path_cell(&self, position: GridPosition) -> bool {
+        self.path.contains(&position)
+    }
+
+    pub fn world_position(&self, position: GridPosition) -> Position {
+        Self::to_world_position(self.width, self.height, position)
+    }
+
     fn to_world_position(width: u32, height: u32, position: GridPosition) -> Position {
         let x_offset = (width.saturating_sub(1) as f32 * TILE_SIZE) / 2.0;
         let z_offset = (height.saturating_sub(1) as f32 * TILE_SIZE) / 2.0;
