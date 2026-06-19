@@ -9,6 +9,7 @@ use crate::features::map::classes::grid_position::GridPosition;
 pub struct Tower {
     grid_position: GridPosition,
     position: Position,
+    rotation_y: f32,
     cooldown_remaining: f32,
 }
 
@@ -17,6 +18,7 @@ impl Tower {
         Self {
             grid_position,
             position,
+            rotation_y: 0.0,
             cooldown_remaining: 0.0,
         }
     }
@@ -27,6 +29,18 @@ impl Tower {
 
     pub fn position(&self) -> Position {
         self.position
+    }
+
+    pub fn rotation_y(&self) -> f32 {
+        self.rotation_y
+    }
+
+    pub fn face_toward(&mut self, target: Position) {
+        let delta_x = target.x - self.position.x;
+        let delta_z = target.z - self.position.z;
+        if delta_x != 0.0 || delta_z != 0.0 {
+            self.rotation_y = (-delta_z).atan2(delta_x);
+        }
     }
 
     pub fn tick_cooldown(&mut self, delta_time: f32) {

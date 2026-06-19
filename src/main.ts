@@ -33,7 +33,7 @@ async function setup() {
 
     const mapService = new MapService(defaultMapJson);
     new MapRenderer(scene, mapService);
-    const enemies = new EnemyRenderer(scene, mapService);
+    const enemies = new EnemyRenderer(scene, mapService, camera, renderer.domElement);
     const towers = new TowerRenderer(scene, mapService, camera, renderer.domElement);
     const timer = new THREE.Timer();
     timer.connect(document);

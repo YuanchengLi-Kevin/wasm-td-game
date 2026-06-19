@@ -67,6 +67,10 @@ impl TowerService {
         Self::collect_positions(self.towers.iter().map(Tower::position))
     }
 
+    pub fn get_tower_rotations(&self) -> Vec<f32> {
+        self.towers.iter().map(Tower::rotation_y).collect()
+    }
+
     pub fn get_projectile_positions(&self) -> Vec<f32> {
         Self::collect_positions(self.projectiles.iter().map(Projectile::position))
     }
@@ -84,6 +88,10 @@ impl TowerService {
             if let Some(target_id) =
                 enemies.nearest_enemy_id(&tower.position(), config.attack_range)
             {
+                let Some(target_position) = enemies.position_by_id(target_id) else {
+                    continue;
+                };
+                tower.face_toward(target_position);
                 self.projectiles
                     .push(Projectile::new(tower.position(), target_id));
                 tower.reset_cooldown(config.attack_cooldown_seconds);

@@ -8,7 +8,7 @@ use std::sync::OnceLock;
 use serde::Deserialize;
 use wasm_bindgen::prelude::*;
 
-const ENEMY_CONFIG_JSON: &str = include_str!("../../constants/enemies/enemy_config.json");
+const ENEMY_CONFIG_JSON: &str = include_str!("../../../constants/enemies/enemy_config.json");
 
 #[wasm_bindgen]
 #[derive(Clone, Copy)]

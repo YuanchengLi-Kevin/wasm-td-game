@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::core::time::FixedStepAccumulator;
 use crate::features::enemy::classes::enemy::Enemy;
-use crate::features::enemy::enemy_config::EnemyType;
+use crate::features::enemy::classes::enemy_config::EnemyType;
 use crate::features::map::classes::game_map::GameMap;
 use crate::features::map::services::map_service::MapService;
 
@@ -75,6 +75,13 @@ impl EnemyService {
             positions.extend_from_slice(&[position.x, position.y, position.z]);
         }
         positions
+    }
+
+    pub fn get_health_ratios(&self) -> Vec<f32> {
+        self.enemies
+            .iter()
+            .map(|enemy| enemy.health() / enemy.max_health())
+            .collect()
     }
 
     pub fn enemy_count(&self) -> u32 {

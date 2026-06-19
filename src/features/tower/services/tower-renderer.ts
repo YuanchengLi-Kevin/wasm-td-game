@@ -100,6 +100,7 @@ export class TowerRenderer {
 
     private syncTowerViews() {
         const positions = this.service.get_tower_positions();
+        const rotations = this.service.get_tower_rotations();
         const towerCount = positions.length / 3;
         while (this.towerViews.length < towerCount) {
             const view = new TowerView();
@@ -110,6 +111,7 @@ export class TowerRenderer {
         for (let index = 0; index < towerCount; index += 1) {
             const offset = index * 3;
             this.towerViews[index].setPosition(positions[offset], positions[offset + 2]);
+            this.towerViews[index].setRotationY(rotations[index]);
         }
     }
 

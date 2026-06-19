@@ -4,7 +4,7 @@
  */
 
 use crate::core::math::Position;
-use crate::features::enemy::enemy_config::{EnemyConfig, EnemyType};
+use crate::features::enemy::classes::enemy_config::{EnemyConfig, EnemyType};
 
 pub struct Enemy {
     id: u32,

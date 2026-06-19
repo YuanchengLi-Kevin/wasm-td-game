@@ -4,5 +4,4 @@
  */
 
 pub mod classes;
-pub mod enemy_config;
 pub mod services;

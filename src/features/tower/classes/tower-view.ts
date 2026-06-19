@@ -8,6 +8,7 @@ import * as THREE from 'three';
 export class TowerView {
     readonly object = new THREE.Group();
 
+    private readonly turretAssembly = new THREE.Group();
     private readonly geometries: THREE.BufferGeometry[];
     private readonly materials: THREE.Material[];
 
@@ -26,13 +27,18 @@ export class TowerView {
         barrel.rotation.z = Math.PI / 2;
         barrel.position.set(0.3, 0.68, 0);
 
-        this.object.add(base, turret, barrel);
+        this.turretAssembly.add(turret, barrel);
+        this.object.add(base, this.turretAssembly);
         this.geometries = [baseGeometry, turretGeometry, barrelGeometry];
         this.materials = [baseMaterial, turretMaterial];
     }
 
     setPosition(x: number, z: number) {
         this.object.position.set(x, 0, z);
+    }
+
+    setRotationY(rotationY: number) {
+        this.turretAssembly.rotation.y = rotationY;
     }
 
     destroy() {
