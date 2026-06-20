@@ -37,6 +37,4 @@ dist-ssr
 
 /target
 AGENTS.md
-Cargo.lock
-package-lock.json
 /public/
