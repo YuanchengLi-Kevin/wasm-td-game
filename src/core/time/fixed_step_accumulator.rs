@@ -28,8 +28,7 @@ impl FixedStepAccumulator {
             0.0
         };
         let max_accumulated_time = self.step_seconds * self.max_steps_per_update as f32;
-        self.accumulated_time =
-            (self.accumulated_time + delta_time).min(max_accumulated_time);
+        self.accumulated_time = (self.accumulated_time + delta_time).min(max_accumulated_time);
 
         let steps = (self.accumulated_time / self.step_seconds) as u32;
         self.accumulated_time -= steps as f32 * self.step_seconds;

@@ -30,8 +30,7 @@ impl Projectile {
         let delta_x = target.x - self.position.x;
         let delta_y = target.y - self.position.y;
         let delta_z = target.z - self.position.z;
-        let target_distance =
-            (delta_x * delta_x + delta_y * delta_y + delta_z * delta_z).sqrt();
+        let target_distance = (delta_x * delta_x + delta_y * delta_y + delta_z * delta_z).sqrt();
 
         if target_distance <= distance {
             self.position = target;

@@ -32,10 +32,7 @@ impl EnemyService {
             enemies: Vec::new(),
             next_enemy_id: 0,
             spawn_timer: 0.0,
-            fixed_step: FixedStepAccumulator::new(
-                FIXED_STEP_SECONDS,
-                MAX_STEPS_PER_UPDATE,
-            ),
+            fixed_step: FixedStepAccumulator::new(FIXED_STEP_SECONDS, MAX_STEPS_PER_UPDATE),
             map: map_service.map().clone(),
         }
     }
@@ -45,7 +42,8 @@ impl EnemyService {
         if let Some(start_position) = self.map.world_path().first() {
             let id = self.next_enemy_id;
             self.next_enemy_id = self.next_enemy_id.wrapping_add(1);
-            self.enemies.push(Enemy::new(id, enemy_type, *start_position));
+            self.enemies
+                .push(Enemy::new(id, enemy_type, *start_position));
         }
         index
     }

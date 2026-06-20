@@ -117,9 +117,7 @@ impl TowerService {
         }
     }
 
-    fn collect_positions(
-        positions: impl Iterator<Item = crate::core::math::Position>,
-    ) -> Vec<f32> {
+    fn collect_positions(positions: impl Iterator<Item = crate::core::math::Position>) -> Vec<f32> {
         let mut result = Vec::new();
         for position in positions {
             result.extend_from_slice(&[position.x, position.y, position.z]);
