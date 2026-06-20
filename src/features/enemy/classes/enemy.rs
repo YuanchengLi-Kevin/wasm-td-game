@@ -73,6 +73,10 @@ impl Enemy {
         self.health <= 0.0
     }
 
+    pub fn has_reached_end(&self, path_length: usize) -> bool {
+        self.next_waypoint_index >= path_length
+    }
+
     pub fn max_health(&self) -> f32 {
         self.config.max_health
     }

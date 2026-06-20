@@ -11,7 +11,8 @@ use wasm_bindgen::prelude::*;
 const ENEMY_CONFIG_JSON: &str = include_str!("../../../constants/enemies/enemy_config.json");
 
 #[wasm_bindgen]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
 pub enum EnemyType {
     Basic,
     Fast,

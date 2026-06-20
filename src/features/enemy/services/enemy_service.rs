@@ -11,7 +11,6 @@ use crate::features::enemy::classes::enemy_config::EnemyType;
 use crate::features::map::classes::game_map::GameMap;
 use crate::features::map::services::map_service::MapService;
 
-const SPAWN_INTERVAL: f32 = 1.0;
 const FIXED_STEP_SECONDS: f32 = 1.0 / 60.0;
 const MAX_STEPS_PER_UPDATE: u32 = 5;
 
@@ -19,7 +18,6 @@ const MAX_STEPS_PER_UPDATE: u32 = 5;
 pub struct EnemyService {
     enemies: Vec<Enemy>,
     next_enemy_id: u32,
-    spawn_timer: f32,
     fixed_step: FixedStepAccumulator,
     map: GameMap,
 }
@@ -31,7 +29,6 @@ impl EnemyService {
         Self {
             enemies: Vec::new(),
             next_enemy_id: 0,
-            spawn_timer: 0.0,
             fixed_step: FixedStepAccumulator::new(FIXED_STEP_SECONDS, MAX_STEPS_PER_UPDATE),
             map: map_service.map().clone(),
         }
@@ -128,15 +125,11 @@ impl EnemyService {
     }
 
     fn simulate(&mut self, step_seconds: f32) {
-        self.spawn_timer += step_seconds;
-        while self.spawn_timer >= SPAWN_INTERVAL {
-            self.spawn_enemy(EnemyType::Basic);
-            self.spawn_timer -= SPAWN_INTERVAL;
-        }
-
         let path = self.map.world_path();
         for enemy in &mut self.enemies {
             enemy.update(step_seconds, path);
         }
+        self.enemies
+            .retain(|enemy| !enemy.has_reached_end(path.len()));
     }
 }

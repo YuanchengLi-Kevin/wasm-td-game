@@ -3,7 +3,4 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-pub mod enemy;
-pub mod map;
-pub mod tower;
-pub mod wave;
+pub mod wave_service;

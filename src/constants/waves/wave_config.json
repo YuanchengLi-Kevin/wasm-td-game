@@ -1,0 +1,49 @@
+{
+  "_copyright": "Copyright (c) 2026 Yuancheng Li",
+  "_license": "Apache-2.0",
+  "intermission_seconds": 3.0,
+  "waves": [
+    {
+      "groups": [
+        {
+          "enemy_type": "basic",
+          "count": 5,
+          "spawn_interval_seconds": 1.0
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "enemy_type": "basic",
+          "count": 6,
+          "spawn_interval_seconds": 0.8
+        },
+        {
+          "enemy_type": "fast",
+          "count": 3,
+          "spawn_interval_seconds": 0.7
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "enemy_type": "tank",
+          "count": 2,
+          "spawn_interval_seconds": 1.5
+        },
+        {
+          "enemy_type": "basic",
+          "count": 8,
+          "spawn_interval_seconds": 0.6
+        },
+        {
+          "enemy_type": "fast",
+          "count": 4,
+          "spawn_interval_seconds": 0.5
+        }
+      ]
+    }
+  ]
+}
