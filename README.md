@@ -66,3 +66,18 @@ Start the Vite dev server:
 ```sh
 npm run dev
 ```
+
+## Testing
+
+Run the native Rust tests:
+
+```sh
+cargo test
+```
+
+Run the WebAssembly tests in headless Chrome or Firefox:
+
+```sh
+wasm-pack test --headless --chrome
+wasm-pack test --headless --firefox
+```
