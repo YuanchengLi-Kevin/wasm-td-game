@@ -11,10 +11,9 @@ import { EnemyHealthBar } from '../ui/enemy-health-bar';
 
 export class EnemyRenderer {
     readonly enemyService: EnemyService;
-    private readonly parent: THREE.Object3D;
     private readonly camera: THREE.Camera;
     private readonly canvas: HTMLCanvasElement;
-    private readonly views: EnemyView[] = [];
+    private readonly view: EnemyView;
     private readonly healthBars: EnemyHealthBar[] = [];
     private destroyed = false;
 
@@ -24,10 +23,10 @@ export class EnemyRenderer {
         camera: THREE.Camera,
         canvas: HTMLCanvasElement
     ) {
-        this.parent = parent;
         this.camera = camera;
         this.canvas = canvas;
         this.enemyService = new EnemyService(mapService);
+        this.view = new EnemyView(parent);
     }
 
     spawn(enemyType: EnemyType = EnemyType.Basic): number {
@@ -36,10 +35,7 @@ export class EnemyRenderer {
         }
 
         const index = this.enemyService.spawn_enemy(enemyType);
-        const view = new EnemyView();
-        this.views.push(view);
         this.healthBars.push(new EnemyHealthBar());
-        this.parent.add(view.mesh);
         return index;
     }
 
@@ -48,9 +44,7 @@ export class EnemyRenderer {
             return false;
         }
 
-        const [view] = this.views.splice(index, 1);
         const [healthBar] = this.healthBars.splice(index, 1);
-        view.destroy();
         healthBar.destroy();
         return true;
     }
@@ -61,38 +55,31 @@ export class EnemyRenderer {
         }
 
         this.enemyService.update(deltaTime);
-        this.syncViewCount();
+        this.syncHealthBars();
         const positions = this.enemyService.get_positions();
         const healthRatios = this.enemyService.get_health_ratios();
+        this.view.update(positions);
         this.camera.updateMatrixWorld();
 
-        for (let index = 0; index < this.views.length; index += 1) {
+        for (let index = 0; index < this.healthBars.length; index += 1) {
             const offset = index * 3;
-            const view = this.views[index];
-            view.setPosition(
-                positions[offset],
-                positions[offset + 1],
-                positions[offset + 2]
-            );
             this.healthBars[index].update(
                 healthRatios[index],
-                view.mesh,
+                positions[offset],
+                positions[offset + 1],
+                positions[offset + 2],
                 this.camera,
                 this.canvas
             );
         }
     }
 
-    private syncViewCount() {
+    private syncHealthBars() {
         const enemyCount = this.enemyService.enemy_count();
-        while (this.views.length < enemyCount) {
-            const view = new EnemyView();
-            this.views.push(view);
+        while (this.healthBars.length < enemyCount) {
             this.healthBars.push(new EnemyHealthBar());
-            this.parent.add(view.mesh);
         }
-        while (this.views.length > enemyCount) {
-            this.views.pop()?.destroy();
+        while (this.healthBars.length > enemyCount) {
             this.healthBars.pop()?.destroy();
         }
     }
@@ -103,13 +90,10 @@ export class EnemyRenderer {
         }
 
         this.destroyed = true;
-        for (const view of this.views) {
-            view.destroy();
-        }
+        this.view.destroy();
         for (const healthBar of this.healthBars) {
             healthBar.destroy();
         }
-        this.views.length = 0;
         this.healthBars.length = 0;
         this.enemyService.free();
     }

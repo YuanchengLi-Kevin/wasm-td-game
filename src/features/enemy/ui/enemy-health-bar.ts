@@ -31,7 +31,9 @@ export class EnemyHealthBar {
 
     update(
         healthRatio: number,
-        enemy: THREE.Object3D,
+        x: number,
+        y: number,
+        z: number,
         camera: THREE.Camera,
         canvas: HTMLCanvasElement
     ) {
@@ -43,8 +45,7 @@ export class EnemyHealthBar {
         this.fill.style.transform = `scaleX(${ratio})`;
         this.element.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
 
-        enemy.getWorldPosition(this.screenPosition);
-        this.screenPosition.y += HEALTH_BAR_HEIGHT_OFFSET;
+        this.screenPosition.set(x, y + HEALTH_BAR_HEIGHT_OFFSET, z);
         this.screenPosition.project(camera);
 
         const isVisible =
@@ -60,9 +61,9 @@ export class EnemyHealthBar {
         }
 
         const bounds = canvas.getBoundingClientRect();
-        const x = bounds.left + (this.screenPosition.x + 1) * bounds.width * 0.5;
-        const y = bounds.top + (1 - this.screenPosition.y) * bounds.height * 0.5;
-        this.element.style.transform = `translate(-50%, -100%) translate(${x}px, ${y}px)`;
+        const screenX = bounds.left + (this.screenPosition.x + 1) * bounds.width * 0.5;
+        const screenY = bounds.top + (1 - this.screenPosition.y) * bounds.height * 0.5;
+        this.element.style.transform = `translate(-50%, -100%) translate(${screenX}px, ${screenY}px)`;
     }
 
     destroy() {

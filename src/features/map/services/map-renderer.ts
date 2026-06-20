@@ -15,6 +15,7 @@ export class MapRenderer {
     private readonly group = new THREE.Group();
     private readonly geometry = new THREE.BoxGeometry(TILE_SIZE * 0.96, TILE_HEIGHT, TILE_SIZE * 0.96);
     private readonly materials: THREE.MeshStandardMaterial[];
+    private readonly meshes: THREE.InstancedMesh[] = [];
 
     constructor(parent: THREE.Object3D, mapService: MapService) {
         const width = mapService.width();
@@ -39,6 +40,7 @@ export class MapRenderer {
             })
         ];
 
+        const tilePositions = this.materials.map(() => [] as THREE.Vector3[]);
         const finalPathIndex = pathCells.length / 2 - 1;
         for (let row = 0; row < height; row += 1) {
             for (let column = 0; column < width; column += 1) {
@@ -50,14 +52,31 @@ export class MapRenderer {
                     materialIndex = 3;
                 }
 
-                const tile = new THREE.Mesh(this.geometry, this.materials[materialIndex]);
-                tile.position.set(
-                    column * TILE_SIZE - ((width - 1) * TILE_SIZE) / 2,
-                    -TILE_HEIGHT / 2,
-                    row * TILE_SIZE - ((height - 1) * TILE_SIZE) / 2
+                tilePositions[materialIndex].push(
+                    new THREE.Vector3(
+                        column * TILE_SIZE - ((width - 1) * TILE_SIZE) / 2,
+                        -TILE_HEIGHT / 2,
+                        row * TILE_SIZE - ((height - 1) * TILE_SIZE) / 2
+                    )
                 );
-                this.group.add(tile);
             }
+        }
+
+        const matrix = new THREE.Matrix4();
+        for (let materialIndex = 0; materialIndex < this.materials.length; materialIndex += 1) {
+            const positions = tilePositions[materialIndex];
+            const tiles = new THREE.InstancedMesh(
+                this.geometry,
+                this.materials[materialIndex],
+                positions.length
+            );
+            for (let index = 0; index < positions.length; index += 1) {
+                matrix.makeTranslation(positions[index]);
+                tiles.setMatrixAt(index, matrix);
+            }
+            tiles.instanceMatrix.needsUpdate = true;
+            this.meshes.push(tiles);
+            this.group.add(tiles);
         }
 
         parent.add(this.group);
@@ -66,6 +85,9 @@ export class MapRenderer {
     destroy() {
         this.group.removeFromParent();
         this.group.clear();
+        for (const mesh of this.meshes) {
+            mesh.dispose();
+        }
         this.geometry.dispose();
         for (const material of this.materials) {
             material.dispose();

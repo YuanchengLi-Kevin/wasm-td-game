@@ -18,7 +18,7 @@ async function setup() {
     scene.background = createSkyBackground();
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 9, 8);
+    camera.position.set(0, 13, 12);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });

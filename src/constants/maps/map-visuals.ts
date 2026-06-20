@@ -4,10 +4,10 @@
  */
 
 export const MAP_TILE_COLORS = {
-    terrain: '#31552f',
-    path: '#9b835f',
-    start: '#2e9f57',
-    startEmissive: '#0b2815',
-    end: '#b93b3b',
-    endEmissive: '#310b0b'
+    terrain: '#238c3d',
+    path: '#d9a441',
+    start: '#20df69',
+    startEmissive: '#075d27',
+    end: '#f04444',
+    endEmissive: '#681010'
 } as const;

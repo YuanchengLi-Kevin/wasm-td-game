@@ -13,7 +13,6 @@ const TILE_SIZE = 1;
 
 export class TowerRenderer {
     private readonly service: TowerService;
-    private readonly parent: THREE.Object3D;
     private readonly camera: THREE.Camera;
     private readonly inputElement: HTMLElement;
     private readonly mapWidth: number;
@@ -21,8 +20,8 @@ export class TowerRenderer {
     private readonly raycaster = new THREE.Raycaster();
     private readonly groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     private readonly intersection = new THREE.Vector3();
-    private readonly towerViews: TowerView[] = [];
-    private readonly projectileViews: ProjectileView[] = [];
+    private readonly towerView: TowerView;
+    private readonly projectileView: ProjectileView;
     private destroyed = false;
 
     constructor(
@@ -31,12 +30,13 @@ export class TowerRenderer {
         camera: THREE.Camera,
         inputElement: HTMLElement
     ) {
-        this.parent = parent;
         this.camera = camera;
         this.inputElement = inputElement;
         this.mapWidth = mapService.width();
         this.mapHeight = mapService.height();
         this.service = new TowerService(mapService);
+        this.towerView = new TowerView(parent);
+        this.projectileView = new ProjectileView(parent);
         this.inputElement.addEventListener('pointerdown', this.handlePointerDown);
     }
 
@@ -57,14 +57,8 @@ export class TowerRenderer {
 
         this.destroyed = true;
         this.inputElement.removeEventListener('pointerdown', this.handlePointerDown);
-        for (const view of this.towerViews) {
-            view.destroy();
-        }
-        for (const view of this.projectileViews) {
-            view.destroy();
-        }
-        this.towerViews.length = 0;
-        this.projectileViews.length = 0;
+        this.towerView.destroy();
+        this.projectileView.destroy();
         this.service.free();
     }
 
@@ -101,39 +95,11 @@ export class TowerRenderer {
     private syncTowerViews() {
         const positions = this.service.get_tower_positions();
         const rotations = this.service.get_tower_rotations();
-        const towerCount = positions.length / 3;
-        while (this.towerViews.length < towerCount) {
-            const view = new TowerView();
-            this.towerViews.push(view);
-            this.parent.add(view.object);
-        }
-
-        for (let index = 0; index < towerCount; index += 1) {
-            const offset = index * 3;
-            this.towerViews[index].setPosition(positions[offset], positions[offset + 2]);
-            this.towerViews[index].setRotationY(rotations[index]);
-        }
+        this.towerView.update(positions, rotations);
     }
 
     private syncProjectileViews() {
         const positions = this.service.get_projectile_positions();
-        const projectileCount = positions.length / 3;
-        while (this.projectileViews.length < projectileCount) {
-            const view = new ProjectileView();
-            this.projectileViews.push(view);
-            this.parent.add(view.mesh);
-        }
-        while (this.projectileViews.length > projectileCount) {
-            this.projectileViews.pop()?.destroy();
-        }
-
-        for (let index = 0; index < projectileCount; index += 1) {
-            const offset = index * 3;
-            this.projectileViews[index].setPosition(
-                positions[offset],
-                positions[offset + 1],
-                positions[offset + 2]
-            );
-        }
+        this.projectileView.update(positions);
     }
 }
